@@ -1,74 +1,138 @@
 #include "raylib.h"
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include "Collidable.h"
 #include "raymath.h"
-#include "Character.h"
-#include "GameplayManager.h"
-#include "Enemy.h"
 
-// GameDev/proto_2
+class Character {
+public:
+    Vector2 getWorldPos() { return worldPos; }
 
-int main()
-{
-    const int windowDimensions[2]{384, 384};
-    InitWindow(windowDimensions[0], windowDimensions[1], "RPG!");
+    void setScreenPos(int winWidth, int winHeight);
+    void tick(float deltaTime);
+private:
+    Texture2D texture{LoadTexture("characters/knight_idle_spritesheet.png")};
+    Texture2D idle{LoadTexture("characters/knight_idle_spritesheet.png")};
+    Texture2D run{LoadTexture("characters/knight_run_spritesheet")};
+    Vector2 screenPos;
+    Vector2 worldPos;
 
-    // create Tile Manager
-    GameplayManager manager(windowDimensions[0], windowDimensions[1]);
+    // 1 : facing right, -1 : facing left
+    float rightLeft{1.0f};
 
-    // Statically create props
-    Collidable Prop(
-        LoadTexture("nature_tileset/Rock.png"),
-        Vector2{400.f, 330.f});
-        manager.props.push_back(&Prop);
+    // animation variables
+    float runningTime{};
+    int frame{};
+    const int maxFrames{6};
+    const float updateTime{1.0f/12.0f};
+    const float speed{4.f};
+    
+};
 
-    Vector2 mapCenter{manager.map.width/2.f, manager.map.height/2.f};
-    Character knight(Vector2{(float)windowDimensions[0], (float)windowDimensions[1]});
-    //knight.setPos(mapCenter);
-    manager.registerMainCharacter(knight);
-    knight.setPosition(mapCenter);
+// adding Character::function name is "fully qualifying the function name"
+// :: scope resolution operator
+void Character::setScreenPos(int winWidth, int winHeight) {
+    screenPos = {
+        screenPos.x = (float)winWidth / 2.0f - 4.0f * (0.5f * (float) texture.width / 6.0f),
+        screenPos.y = (float)winHeight / 2.0f - 4.0f * (0.5f * (float)texture.height)
+    };
+};
 
-    Enemy goblin{};
-    goblin.setIdleSheet(LoadTexture("characters/goblin_idle_spritesheet.png"));
-    goblin.setRunSheet(LoadTexture("characters/goblin_run_spritesheet.png"));
-    goblin.setPos(Vector2{350.f, 200.f});
-    goblin.setTarget(&knight);
-    manager.AddEnemy(&goblin);
+void Character::tick(float deltaTime) {
+    Vector2 direction{};
 
-    Enemy goblin2{};
-    goblin2.setIdleSheet(LoadTexture("characters/goblin_idle_spritesheet.png"));
-    goblin2.setRunSheet(LoadTexture("characters/goblin_run_spritesheet.png"));
-    goblin2.setPos(Vector2{250.f, 600.f});
-    goblin2.setTarget(&knight);
-    manager.AddEnemy(&goblin2);
+    if (IsKeyDown(KEY_A)) direction.x -= 1.0;
+    if (IsKeyDown(KEY_D)) direction.x += 1.0;
+    if (IsKeyDown(KEY_W)) direction.y -= 1.0;
+    if (IsKeyDown(KEY_S)) direction.y += 1.0;
 
-    Enemy slime{};
-    slime.setIdleSheet(LoadTexture("characters/slime_idle_spritesheet.png"));
-    slime.setRunSheet(LoadTexture("characters/slime_run_spritesheeet.png"));
-    slime.setPos(Vector2{mapCenter.x + 50.f, mapCenter.y + 50.f});
-    slime.setTarget(&knight);
-    manager.AddEnemy(&slime);
+    if (Vector2Length(direction) != 0.0) {
+        // set worldPos = worldPos + direction
+        worldPos = Vector2Add(worldPos, Vector2Scale(Vector2Normalize(direction), speed));
+        direction.x < 0.f ? rightLeft = -1.f : rightLeft = 1.f;
+        texture = run;
+    } else {
+        texture = idle;
+    };
 
-    Enemy slime2{};
-    slime2.setIdleSheet(LoadTexture("characters/slime_run_spritesheeet.png"));
-    slime2.setRunSheet(LoadTexture("characters/slime_run_spritesheeet.png"));
-    slime2.setPos(Vector2{200.f, 200.f});
-    slime2.setTarget(&knight);
-    manager.AddEnemy(&slime2);
+    // Update Animation Frames
+    runningTime += deltaTime;
+    if (runningTime >= updateTime) {
+        runningTime = 0.f;
+        frame++;
+        
+        if (frame > maxFrames) frame = 0;
+    };
+
+};
+
+int main() {
+    const int windowWidth{384};
+    const int windowHeight{384};
+    InitWindow(windowWidth, windowHeight, "RPG");
+
+    Texture2D map = LoadTexture("nature_tileset/map24x24.png");
+    Vector2 mapPos{0.0, 0.0};
+    float speed{4.0};
+
+    Texture2D knight = LoadTexture("characters/knight_idle_spritesheet.png");
+    Texture2D knight_idle = LoadTexture("characters/knight_idle_spritesheet.png");
+    Texture2D knight_run = LoadTexture("characters/knight_run_spritesheet.png");
+    Vector2 knightPos {
+        (float)windowWidth/2.0f - 4.0f * (0.5f * (float)knight.width/6.0f),
+        (float)windowHeight/2.0f - 4.0f * (0.5f * (float)knight.height)
+    };
+
+    // 1 : facing right, -1 : facing left
+    float rightLeft{1.f};
+    // animation variables
+    float runningTime{};
+    int frame{};
+    const int maxFrames{6};
+    const float updateTime{1.f/12.f};
+
+
 
     SetTargetFPS(60);
-    while (!WindowShouldClose())
-    {
-
+    while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(WHITE);
 
-        manager.Update();
+        Vector2 direction{};
+        if (IsKeyDown(KEY_A)) direction.x -= 1.0;
+        if (IsKeyDown(KEY_D)) direction.x += 1.0;
+        if (IsKeyDown(KEY_W)) direction.y -= 1.0;
+        if (IsKeyDown(KEY_S)) direction.y += 1.0;
+
+        if (Vector2Length(direction) != 0.0) {
+            // set mapPos = mapPos - direction    
+            mapPos = Vector2Subtract(mapPos, Vector2Scale(Vector2Normalize(direction), speed));
+            direction.x < 0.f ? rightLeft = -1.f : rightLeft = 1.f;
+            knight = knight_run;
+        } else {
+            knight = knight_idle;
+        }
+        
+        // draw the map
+        DrawTextureEx(map, mapPos, 0.0, 4.0, WHITE);
+
+        // update animation frame
+        runningTime += GetFrameTime();
+        if (runningTime >= updateTime) {
+            runningTime = 0.f;
+            frame++;
+          
+            if (frame > maxFrames) frame = 0;
+        };
+
+        // draw the character
+        Rectangle source{frame * (float)knight.width/6.f, 0.f, rightLeft * (float)knight.width/6.f, (float)knight.height};
+        Rectangle dest{knightPos.x, knightPos.y, 4.0f * (float)knight.width/6.0f, 4.0f * (float)knight.height};
+        DrawTexturePro(knight, source, dest, Vector2{}, 0.f, WHITE);
 
         EndDrawing();
-    }
-    CloseWindow();
+    };
 
-}
+    UnloadTexture(knight);
+    UnloadTexture(map);
+    UnloadTexture(knight_idle);
+    UnloadTexture(knight_run);
+    CloseWindow();
+};
