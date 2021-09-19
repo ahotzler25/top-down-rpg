@@ -16,7 +16,7 @@ Character::Character(int winWidth, int winHeight) {
 
 void Character::tick(float deltaTime)
 {
-    worldPosLastFrame = worldPos;
+    BaseCharacter::tick(deltaTime);
 
     Vector2 direction{};
     if (IsKeyDown(KEY_A)) 
@@ -28,43 +28,12 @@ void Character::tick(float deltaTime)
     if (IsKeyDown(KEY_S)) 
         direction.y += 1.0;
 
-    if (Vector2Length(direction) != 0.0)
-    {
+    if (Vector2Length(direction) != 0.0) {
         // set worldPos = worldPos + direction
         worldPos = Vector2Add(worldPos, Vector2Scale(Vector2Normalize(direction), speed));
         direction.x < 0.f ? rightLeft = -1.f : rightLeft = 1.f;
         texture = run;
-    }
-    else
-    {
+    } else {
         texture = idle;
     }
-
-    // Update Animation Frames
-    runningTime += deltaTime;
-    if (runningTime >= updateTime)
-    {
-        frame++;
-        runningTime = 0.f;
-        if (frame > maxFrames)
-            frame = 0;
-    }
-
-    // Draw the character
-    Rectangle source{frame * width, 0.f, rightLeft * width, height};
-    Rectangle dest{screenPos.x, screenPos.y, scale * width, scale * height};
-    DrawTexturePro(texture, source, dest, Vector2{}, 0.f, WHITE);
-}
-
-void Character::undoMovement() {
-    worldPos = worldPosLastFrame;
-}
-
-Rectangle Character::getCollisionRec() {
-    return Rectangle{
-        screenPos.x,
-        screenPos.y,
-        width * scale,
-        height * scale
-    };
 }
