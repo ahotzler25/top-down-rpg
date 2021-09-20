@@ -6,8 +6,8 @@
 
 int main()
 {
-    const int windowWidth{384};
-    const int windowHeight{384};
+    const int windowWidth{780};
+    const int windowHeight{780};
     // const int windowWidth{780};
     // const int windowHeight{780};
     InitWindow(windowWidth, windowHeight, "RPG");
@@ -72,6 +72,12 @@ int main()
         }
 
         goblin.tick(GetFrameTime());
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (CheckCollisionRecs(goblin.getCollisionRec(), knight.getWeaponCollisionRec())) {
+                goblin.setAlive(false);
+            };
+        };
 
         EndDrawing();
     }
