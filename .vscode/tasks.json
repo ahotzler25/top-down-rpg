@@ -15,23 +15,19 @@
                 "command": "C:/raylib/mingw/bin/mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileDirname}/*.cpp",
+                    "PROJECT_NAME=main",
+                    "OBJS=*.cpp",
                     "BUILD_MODE=DEBUG"
-                ],
+                ]
             },
             "osx": {
                 "args": [
-                    "RAYLIB_PATH=<path_to_raylib>/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileDirname}/*.cpp",
+                    "PROJECT_NAME=main",
+                    "OBJS=*.cpp",
                     "BUILD_MODE=DEBUG"
-                ],
+                ]
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": [
                 "$gcc"
             ]
@@ -41,22 +37,21 @@
             "type": "process",
             "command": "make",
             "args": [
-                "PLATFORM=PLATFORM_DESKTOP",
+                "PLATFORM=PLATFORM_DESKTOP"
             ],
             "windows": {
                 "command": "C:/raylib/mingw/bin/mingw32-make.exe",
                 "args": [
                     "RAYLIB_PATH=C:/raylib/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileDirname}/*.cpp"
-                ],
+                    "PROJECT_NAME=main",
+                    "OBJS=*.cpp"
+                ]
             },
             "osx": {
                 "args": [
-                    "RAYLIB_PATH=<path_to_raylib>/raylib",
-                    "PROJECT_NAME=${fileBasenameNoExtension}",
-                    "OBJS=${fileDirname}/*.cpp"
-                ],
+                    "PROJECT_NAME=main",
+                    "OBJS=*.cpp"
+                ]
             },
             "group": "build",
             "problemMatcher": [
@@ -65,17 +60,16 @@
         },
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file",
-            "command": "C:\\raylib\\mingw\\bin\\g++.exe",
+            "label": "C/C++: gcc.exe build active file",
+            "command": "C:/raylib/mingw/bin/gcc.exe",
             "args": [
                 "-g",
-                "${workspaceFolder}\\*.cpp",
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
             "options": {
-                "cwd": "C:\\raylib\\mingw\\bin"
+                "cwd": "C:/raylib/mingw/bin"
             },
             "problemMatcher": [
                 "$gcc"
@@ -84,7 +78,8 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "compiler: C:\\raylib\\mingw\\bin\\g++.exe"
+            "detail": "compiler: C:/raylib/mingw/bin/gcc.exe"
         }
     ]
 }
+

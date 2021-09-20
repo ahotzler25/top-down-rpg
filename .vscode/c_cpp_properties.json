@@ -21,7 +21,6 @@
         {
             "name": "Mac",
             "includePath": [
-                "<path_to_raylib>/src/**",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -61,3 +60,4 @@
     ],
     "version": 4
 }
+
